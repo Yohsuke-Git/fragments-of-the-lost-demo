@@ -1,7 +1,7 @@
 export const VIEWPORT = Object.freeze({ width: 960, height: 540 });
 
 export const HERO = Object.freeze({
-  speed: 90,
+  speed: 70,
   width: 52,
   height: 52,
   collider: Object.freeze({ offsetX: 18, offsetY: 43, width: 16, height: 8 }),
@@ -20,7 +20,6 @@ export const HERO_SPRITE = Object.freeze({
   directionRow: Object.freeze({ down: 0, left: 2, right: 2, up: 3 }),
   directionFlipX: Object.freeze({ down: false, left: true, right: false, up: false }),
   directionOffsetY: Object.freeze({ down: 0, left: 0, right: 0, up: 0 }),
-  blendStart: Object.freeze({ down: 0.45, left: 0.6, right: 0.6, up: 0.8 }),
   sourceInsets: Object.freeze({
     down: Object.freeze({ top: 0, right: 0, bottom: 0, left: 0 }),
     left: Object.freeze({ top: 1, right: 0, bottom: 0, left: 0 }),

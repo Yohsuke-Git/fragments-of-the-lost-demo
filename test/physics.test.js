@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { getAnimationFrame, getAnimationState } from "../src/animation.js";
+import { getAnimationFrame } from "../src/animation.js";
 import {
   cameraFor,
   collides,
@@ -26,23 +26,6 @@ test("walking animation cycles through six frames while idle uses its configured
   assert.equal(getAnimationFrame(true, 0.21, sprite), 2);
   assert.equal(getAnimationFrame(true, 0.51, sprite), 5);
   assert.equal(getAnimationFrame(true, 0.61, sprite), 0);
-});
-
-test("walking animation smoothly blends each frame into the next", () => {
-  assert.deepEqual(getAnimationState(false, 100, sprite), {
-    currentFrame: 2,
-    nextFrame: 2,
-    progress: 0,
-    blend: 0,
-  });
-  const transition = getAnimationState(true, 0.05, sprite);
-  assert.equal(transition.currentFrame, 0);
-  assert.equal(transition.nextFrame, 1);
-  assert.equal(transition.blend, 0.5);
-  const loop = getAnimationState(true, 0.59, sprite);
-  assert.equal(loop.currentFrame, 5);
-  assert.equal(loop.nextFrame, 0);
-  assert.ok(loop.blend > 0.9);
 });
 
 test("diagonal movement preserves the configured speed", () => {

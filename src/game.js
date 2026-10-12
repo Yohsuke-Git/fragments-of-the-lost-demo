@@ -1,5 +1,5 @@
 import { HERO, HERO_SPRITE, VIEWPORT } from "./config.js";
-import { getAnimationFrame, getAnimationState } from "./animation.js";
+import { getAnimationFrame } from "./animation.js";
 import { cameraFor, directionFromVelocity, movePlayer, velocityFromInput } from "./physics.js";
 
 const canvas = document.querySelector("#game");
@@ -24,6 +24,7 @@ let mapImage;
 let player;
 let camera = { x: 0, y: 0 };
 let elapsed = 0;
+let walkElapsed = 0;
 let lastFrameTime = 0;
 
 window.addEventListener("keydown", (event) => setDirection(event, true));
@@ -69,7 +70,7 @@ async function load() {
       ready: true,
       player: { ...player },
       camera: { ...camera },
-      animationFrame: getAnimationFrame(player.moving, elapsed, HERO_SPRITE),
+      animationFrame: getAnimationFrame(player.moving, walkElapsed, HERO_SPRITE),
       map: {
         name: map.name,
         width: map.width,
@@ -123,7 +124,12 @@ function update(delta) {
   player.moving = velocity.x !== 0 || velocity.y !== 0;
   if (player.moving) {
     player.direction = directionFromVelocity(velocity);
-    Object.assign(player, movePlayer(player, velocity, delta, map, HERO));
+    const moved = movePlayer(player, velocity, delta, map, HERO);
+    const distance = Math.hypot(moved.x - player.x, moved.y - player.y);
+    walkElapsed += distance / HERO.speed;
+    Object.assign(player, moved);
+  } else {
+    walkElapsed = 0;
   }
   camera = cameraFor(player, map, VIEWPORT, HERO);
 }
@@ -270,7 +276,7 @@ function drawObject(type, column, row, size) {
 
 function drawHero() {
   const row = HERO_SPRITE.directionRow[player.direction];
-  const animation = getAnimationState(player.moving, elapsed, HERO_SPRITE);
+  const frame = getAnimationFrame(player.moving, walkElapsed, HERO_SPRITE);
   const x = Math.round(player.x - camera.x);
   const y = Math.round(player.y - camera.y);
   const inset = HERO_SPRITE.sourceInsets[player.direction];
@@ -286,16 +292,11 @@ function drawHero() {
   context.fill();
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
-  const blendStart = HERO_SPRITE.blendStart[player.direction];
-  const transitionProgress = Math.max(0, (animation.progress - blendStart) / (1 - blendStart));
-  const blend = transitionProgress * transitionProgress * (3 - 2 * transitionProgress);
-  drawHeroFrame(animation.currentFrame, 1 - blend);
-  if (blend > 0) drawHeroFrame(animation.nextFrame, blend);
+  drawHeroFrame(frame);
   context.imageSmoothingEnabled = false;
 
-  function drawHeroFrame(frame, opacity) {
+  function drawHeroFrame(frame) {
     context.save();
-    context.globalAlpha = opacity;
     if (HERO_SPRITE.directionFlipX[player.direction]) {
       context.translate(destinationX + destinationWidth, 0);
       context.scale(-1, 1);

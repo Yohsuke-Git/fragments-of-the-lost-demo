@@ -32,8 +32,6 @@ test("left walk mirrors the correct six-frame right-facing cycle", () => {
 });
 
 test("town walking pace keeps each limb pose visible", () => {
-  assert.equal(HERO.speed, 90);
+  assert.equal(HERO.speed, 70);
   assert.equal(HERO_SPRITE.framesPerSecond, 7);
-  assert.ok(HERO_SPRITE.blendStart.left >= 0.6);
-  assert.ok(HERO_SPRITE.blendStart.up >= 0.8);
 });
