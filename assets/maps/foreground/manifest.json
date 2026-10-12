@@ -1,0 +1,11 @@
+[
+  { "id": "house-01", "category": "house", "file": "houses/house-01.png", "depthY": 538 },
+  { "id": "house-02", "category": "house", "file": "houses/house-02.png", "depthY": 304 },
+  { "id": "house-03", "category": "house", "file": "houses/house-03.png", "depthY": 214 },
+  { "id": "house-04", "category": "house", "file": "houses/house-04.png", "depthY": 233 },
+  { "id": "house-05", "category": "house", "file": "houses/house-05.png", "depthY": 335 },
+  { "id": "house-06", "category": "house", "file": "houses/house-06.png", "depthY": 555 },
+  { "id": "house-07", "category": "house", "file": "houses/house-07.png", "depthY": 805 },
+  { "id": "house-08", "category": "house", "file": "houses/house-08.png", "depthY": 800 },
+  { "id": "house-09", "category": "house", "file": "houses/house-09.png", "depthY": 850 }
+]

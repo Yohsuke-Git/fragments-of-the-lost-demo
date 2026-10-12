@@ -1,5 +1,6 @@
 import { HERO, HERO_SPRITE, VIEWPORT } from "./config.js";
 import { getAnimationFrame } from "./animation.js";
+import { playerDepth, shouldDrawInFront } from "./depth.js";
 import { cameraFor, directionFromVelocity, movePlayer, velocityFromInput } from "./physics.js";
 
 const canvas = document.querySelector("#game");
@@ -21,6 +22,7 @@ context.imageSmoothingEnabled = false;
 let map;
 let heroImage;
 let mapImage;
+let foregroundObjects = [];
 let player;
 let camera = { x: 0, y: 0 };
 let elapsed = 0;
@@ -48,9 +50,10 @@ async function load() {
   if (!mapResponse.ok) throw new Error(`マップを読み込めませんでした (${mapResponse.status})`);
   map = await mapResponse.json();
   validateMap(map);
-  [heroImage, mapImage] = await Promise.all([
+  [heroImage, mapImage, foregroundObjects] = await Promise.all([
     loadImage(HERO_SPRITE.url),
     loadImage(map.background),
+    loadForegroundObjects(map.foregroundManifest),
   ]);
   player = map.background ? {
     x: map.spawn.x - HERO.width / 2,
@@ -83,6 +86,21 @@ async function load() {
   status.textContent = `${map.name} — 移動できます`;
   canvas.focus();
   requestAnimationFrame(frame);
+}
+
+async function loadForegroundObjects(manifestUrl) {
+  if (!manifestUrl) return [];
+  const response = await fetch(manifestUrl);
+  if (!response.ok) throw new Error(`前景データを読み込めませんでした (${response.status})`);
+  const manifest = await response.json();
+  if (!Array.isArray(manifest)) throw new Error("前景データの形式が不正です");
+  const baseUrl = new URL(".", new URL(manifestUrl, window.location.href));
+  return Promise.all(manifest.map(async (object) => {
+    if (!object.file || !Number.isFinite(object.depthY)) {
+      throw new Error("前景オブジェクトの設定が不正です");
+    }
+    return { ...object, image: await loadImage(new URL(object.file, baseUrl).href) };
+  }));
 }
 
 function loadImage(url) {
@@ -187,6 +205,7 @@ function drawTown() {
     VIEWPORT.height,
   );
   drawHero();
+  drawTownForeground();
 
   const warmth = context.createRadialGradient(
     VIEWPORT.width / 2, VIEWPORT.height / 2, VIEWPORT.height * 0.2,
@@ -196,6 +215,24 @@ function drawTown() {
   warmth.addColorStop(1, "rgba(73, 48, 26, .1)");
   context.fillStyle = warmth;
   context.fillRect(0, 0, VIEWPORT.width, VIEWPORT.height);
+}
+
+function drawTownForeground() {
+  const depth = playerDepth(player, HERO);
+  for (const object of foregroundObjects) {
+    if (!shouldDrawInFront(object.depthY, depth)) continue;
+    context.drawImage(
+      object.image,
+      Math.round(camera.x),
+      Math.round(camera.y),
+      VIEWPORT.width,
+      VIEWPORT.height,
+      0,
+      0,
+      VIEWPORT.width,
+      VIEWPORT.height,
+    );
+  }
 }
 
 function screenPosition(column, row, tileSize) {

@@ -2,9 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { HERO, VIEWPORT } from "../src/config.js";
+import { playerDepth, shouldDrawInFront } from "../src/depth.js";
 import { cameraFor, collides, isWalkableAt, movePlayer } from "../src/physics.js";
 
 const map = JSON.parse(await readFile(new URL("../assets/maps/town.json", import.meta.url), "utf8"));
+const foreground = JSON.parse(await readFile(new URL(`../${map.foregroundManifest}`, import.meta.url), "utf8"));
 
 function playerAtFoot(x, y) {
   return { x: x - HERO.width / 2, y: y - HERO.height };
@@ -35,14 +37,13 @@ test("town entrance, plaza routes, and building doors are walkable", () => {
   }
 });
 
-test("fences, trees, roofs, houses, fountain, and water are blocked", () => {
+test("fences, trees, house foundations, fountain, and water are blocked", () => {
   const blockedPoints = [
     [768, 480, "fountain"],
     [200, 270, "fence and flower bed"],
     [350, 225, "tree"],
-    [250, 360, "roof"],
-    [285, 500, "house"],
-    [495, 730, "lower house"],
+    [250, 525, "house foundation"],
+    [430, 790, "lower house foundation"],
     [200, 700, "garden"],
     [500, 950, "left water"],
     [1100, 960, "right water"],
@@ -51,6 +52,43 @@ test("fences, trees, roofs, houses, fountain, and water are blocked", () => {
     assert.equal(isWalkableAt(map, x, y), false, `${label} at ${x},${y} should be blocked`);
     assert.equal(collides(playerAtFoot(x, y), map, HERO), true, `${label} must block the player`);
   }
+});
+
+test("the player can use the passages hidden behind extracted houses", () => {
+  const behindHousePoints = [
+    [250, 400],
+    [500, 180],
+    [1050, 180],
+    [1400, 420],
+    [450, 690],
+    [1080, 680],
+    [1460, 700],
+  ];
+  for (const [x, y] of behindHousePoints) {
+    assert.equal(isWalkableAt(map, x, y), true, `${x},${y} should be a behind-house passage`);
+    assert.equal(collides(playerAtFoot(x, y), map, HERO), false, `${x},${y} should fit the hero`);
+  }
+});
+
+test("foreground house files align with the full town canvas", async () => {
+  assert.equal(foreground.length, 9);
+  for (const object of foreground) {
+    assert.equal(object.category, "house");
+    assert.ok(Number.isFinite(object.depthY));
+    const png = await readFile(new URL(`../assets/maps/foreground/${object.file}`, import.meta.url));
+    assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+    assert.equal(png.readUInt32BE(16), map.width);
+    assert.equal(png.readUInt32BE(20), map.height);
+    assert.equal(png[25], 6, `${object.file} must be RGBA`);
+  }
+});
+
+test("foreground depth changes only when the player's feet cross the object", () => {
+  const object = foreground[0];
+  const behind = playerAtFoot(250, object.depthY - 10);
+  const inFront = playerAtFoot(250, object.depthY + 10);
+  assert.equal(shouldDrawInFront(object.depthY, playerDepth(behind, HERO)), true);
+  assert.equal(shouldDrawInFront(object.depthY, playerDepth(inFront, HERO)), false);
 });
 
 test("player can walk from the entrance and around the fountain", () => {
@@ -70,11 +108,11 @@ test("player can walk from the entrance and around the fountain", () => {
   assert.equal(collides(player, map, HERO), false);
 });
 
-test("movement stops before a roof and before the waterline", () => {
-  const besideRoof = playerAtFoot(410, 360);
-  const againstRoof = movePlayer(besideRoof, { x: -180, y: 0 }, 1, map, HERO);
-  assert.ok(againstRoof.x + HERO.width / 2 >= 388);
-  assert.equal(collides(againstRoof, map, HERO), false);
+test("movement stops before a house foundation and before the waterline", () => {
+  const behindHouse = playerAtFoot(250, 480);
+  const againstFoundation = movePlayer(behindHouse, { x: 0, y: 100 }, 1, map, HERO);
+  assert.ok(againstFoundation.y + HERO.height < 510);
+  assert.equal(collides(againstFoundation, map, HERO), false);
 
   const aboveWater = playerAtFoot(500, 850);
   const againstWater = movePlayer(aboveWater, { x: 0, y: 180 }, 1, map, HERO);
