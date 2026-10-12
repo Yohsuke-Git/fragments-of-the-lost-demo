@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { HERO, HERO_SPRITE } from "../src/config.js";
 
-test("fixed hero PNG matches the configured 6 by 4 sprite grid", async () => {
+test("fixed hero PNG matches the configured 8 by 4 sprite grid", async () => {
   const imageUrl = new URL(`../${HERO_SPRITE.url}`, import.meta.url);
   const png = await readFile(imageUrl);
   assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
@@ -22,13 +22,13 @@ test("direction corrections stay inside each source frame", () => {
   }
 });
 
-test("left walk mirrors the correct six-frame right-facing cycle", () => {
-  assert.deepEqual(HERO_SPRITE.animation, [0, 1, 2, 3, 4, 5]);
-  assert.equal(HERO_SPRITE.directionRow.left, HERO_SPRITE.directionRow.right);
-  assert.equal(HERO_SPRITE.directionFlipX.left, true);
+test("left and right use their own eight-frame alternating cycles", () => {
+  assert.deepEqual(HERO_SPRITE.animation, [0, 1, 2, 3, 4, 5, 6, 7]);
+  assert.notEqual(HERO_SPRITE.directionRow.left, HERO_SPRITE.directionRow.right);
+  assert.equal(HERO_SPRITE.directionFlipX.left, false);
   assert.equal(HERO_SPRITE.directionFlipX.right, false);
-  assert.equal(HERO_SPRITE.sourceInsets.left.top, 1);
-  assert.equal(HERO_SPRITE.sourceInsets.right.top, 1);
+  assert.equal(HERO_SPRITE.sourceInsets.left.top, 0);
+  assert.equal(HERO_SPRITE.sourceInsets.right.top, 0);
 });
 
 test("town walking pace keeps each limb pose visible", () => {
