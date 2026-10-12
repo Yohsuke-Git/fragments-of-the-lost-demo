@@ -1,10 +1,10 @@
 export const VIEWPORT = Object.freeze({ width: 960, height: 540 });
 
 export const HERO = Object.freeze({
-  speed: 190,
-  width: 112,
-  height: 112,
-  collider: Object.freeze({ offsetX: 39, offsetY: 91, width: 34, height: 17 }),
+  speed: 150,
+  width: 52,
+  height: 52,
+  collider: Object.freeze({ offsetX: 18, offsetY: 43, width: 16, height: 8 }),
 });
 
 export const HERO_SPRITE = Object.freeze({

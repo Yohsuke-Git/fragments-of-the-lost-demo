@@ -20,6 +20,7 @@ context.imageSmoothingEnabled = false;
 
 let map;
 let heroImage;
+let mapImage;
 let player;
 let camera = { x: 0, y: 0 };
 let elapsed = 0;
@@ -42,15 +43,20 @@ function clearInput() {
 }
 
 async function load() {
-  const [mapResponse, image] = await Promise.all([
-    fetch("assets/maps/meadow.json"),
-    loadImage(HERO_SPRITE.url),
-  ]);
+  const mapResponse = await fetch("assets/maps/town.json");
   if (!mapResponse.ok) throw new Error(`マップを読み込めませんでした (${mapResponse.status})`);
   map = await mapResponse.json();
   validateMap(map);
-  heroImage = image;
-  player = {
+  [heroImage, mapImage] = await Promise.all([
+    loadImage(HERO_SPRITE.url),
+    loadImage(map.background),
+  ]);
+  player = map.background ? {
+    x: map.spawn.x - HERO.width / 2,
+    y: map.spawn.y - HERO.height,
+    direction: "down",
+    moving: false,
+  } : {
     x: map.spawn.column * map.tileSize + (map.tileSize - HERO.width) / 2,
     y: (map.spawn.row + 1) * map.tileSize - HERO.height,
     direction: "down",
@@ -64,7 +70,12 @@ async function load() {
       player: { ...player },
       camera: { ...camera },
       animationFrame: getAnimationFrame(player.moving, elapsed, HERO_SPRITE),
-      map: { name: map.name, width: map.width, height: map.rows.length, tileSize: map.tileSize },
+      map: {
+        name: map.name,
+        width: map.width,
+        height: map.background ? map.height : map.rows.length,
+        tileSize: map.tileSize ?? null,
+      },
     }),
   };
   loading.classList.add("hidden");
@@ -83,6 +94,15 @@ function loadImage(url) {
 }
 
 function validateMap(value) {
+  if (value.background) {
+    if (!Number.isFinite(value.width) || !Number.isFinite(value.height)) {
+      throw new Error("背景マップのサイズが不正です");
+    }
+    if (!value.walkable?.rectangles || !value.walkable?.ellipses) {
+      throw new Error("街の通行範囲がありません");
+    }
+    return;
+  }
   if (!Array.isArray(value.rows) || value.rows.length === 0) throw new Error("マップ行がありません");
   if (value.rows.some((row) => row.length !== value.width)) throw new Error("マップの行幅が一致しません");
   const spawnTile = value.rows[value.spawn.row]?.[value.spawn.column];
@@ -110,6 +130,10 @@ function update(delta) {
 
 function render() {
   context.clearRect(0, 0, VIEWPORT.width, VIEWPORT.height);
+  if (map.background) {
+    drawTown();
+    return;
+  }
   const tileSize = map.tileSize;
   const firstColumn = Math.max(0, Math.floor(camera.x / tileSize) - 1);
   const lastColumn = Math.min(map.width, Math.ceil((camera.x + VIEWPORT.width) / tileSize) + 1);
@@ -141,6 +165,30 @@ function render() {
   shade.addColorStop(0, "rgba(3, 10, 6, 0)");
   shade.addColorStop(1, "rgba(3, 10, 6, .28)");
   context.fillStyle = shade;
+  context.fillRect(0, 0, VIEWPORT.width, VIEWPORT.height);
+}
+
+function drawTown() {
+  context.drawImage(
+    mapImage,
+    Math.round(camera.x),
+    Math.round(camera.y),
+    VIEWPORT.width,
+    VIEWPORT.height,
+    0,
+    0,
+    VIEWPORT.width,
+    VIEWPORT.height,
+  );
+  drawHero();
+
+  const warmth = context.createRadialGradient(
+    VIEWPORT.width / 2, VIEWPORT.height / 2, VIEWPORT.height * 0.2,
+    VIEWPORT.width / 2, VIEWPORT.height / 2, VIEWPORT.width * 0.75,
+  );
+  warmth.addColorStop(0, "rgba(255, 235, 176, .035)");
+  warmth.addColorStop(1, "rgba(73, 48, 26, .1)");
+  context.fillStyle = warmth;
   context.fillRect(0, 0, VIEWPORT.width, VIEWPORT.height);
 }
 

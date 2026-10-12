@@ -1,6 +1,6 @@
-# Fragments of the Lost — Field Demo
+# Fragments of the Lost — Town Demo
 
-固定スプライトを使った、小規模な2D JRPG風フィールド歩行デモです。ゲーム本編ではなく、移動・歩行アニメーション・カメラ追従・障害物との当たり判定を確認するためのプロトタイプです。
+固定スプライトと一枚絵の街背景を使った、小規模な2D JRPG風歩行デモです。ゲーム本編ではなく、移動・歩行アニメーション・カメラ追従・障害物との当たり判定を確認するためのプロトタイプです。
 
 公開デモ: <https://yohsuke-git.github.io/fragments-of-the-lost-demo/>
 
@@ -36,7 +36,8 @@ npm test
 ## 構成
 
 - `assets/characters/`: 固定キャラクター画像
-- `assets/maps/meadow.json`: タイルマップと当たり判定定義
+- `assets/maps/FL-town.jpg`: 街全体の固定背景画像
+- `assets/maps/town.json`: 街の開始位置と通行範囲
 - `assets/tiles/`, `assets/objects/`: 将来のタイル・オブジェクト画像用
 - `src/config.js`: スプライト、速度、画面サイズの設定
 - `src/physics.js`: 移動、当たり判定、カメラ計算
