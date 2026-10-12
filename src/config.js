@@ -14,7 +14,7 @@ export const HERO_SPRITE = Object.freeze({
   framesPerRow: 6,
   idleFrame: 2,
   animation: Object.freeze([0, 1, 2, 3, 4, 5]),
-  framesPerSecond: 6,
+  framesPerSecond: 5,
   // The authored left row does not alternate its limbs. Mirror the correct
   // right-facing cycle so both horizontal directions have a true walk loop.
   directionRow: Object.freeze({ down: 0, left: 2, right: 2, up: 3 }),
