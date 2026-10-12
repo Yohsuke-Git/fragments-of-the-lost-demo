@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#18271f" />
+    <title>Fragments of the Lost — Field Demo</title>
+    <link rel="icon" href="assets/ui/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="game-header">
+        <div>
+          <p class="eyebrow">FIELD EXPLORATION DEMO</p>
+          <h1>Fragments of the Lost</h1>
+        </div>
+        <div class="controls" aria-label="操作方法">
+          <span class="key">WASD</span>
+          <span class="divider">or</span>
+          <span class="key">矢印キー</span>
+          <span class="label">で移動</span>
+        </div>
+      </header>
+
+      <section class="viewport-frame" aria-label="ゲーム画面">
+        <canvas id="game" width="960" height="540" tabindex="0">
+          このブラウザはCanvasに対応していません。
+        </canvas>
+        <div id="loading" class="loading" role="status">世界を読み込んでいます…</div>
+        <div class="location-card" aria-hidden="true">
+          <span class="location-kicker">THE VERDANT MERE</span>
+          <span>翠雨のほとり</span>
+        </div>
+      </section>
+
+      <footer>
+        <span id="status" aria-live="polite">読み込み中</span>
+        <span>固定アセット・プロトタイプ</span>
+      </footer>
+    </main>
+    <script type="module" src="src/game.js"></script>
+  </body>
+</html>

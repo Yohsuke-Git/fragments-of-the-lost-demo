@@ -1,0 +1,31 @@
+{
+  "name": "翠雨のほとり",
+  "tileSize": 48,
+  "width": 30,
+  "solidTiles": ["w", "t", "r", "f", "h"],
+  "spawn": { "column": 14, "row": 5 },
+  "rows": [
+    "wwwwwwwwwwwwwwwwwwwwwwwwwwwwww",
+    "wttggggggggggppgggggggggggtttw",
+    "wtggggrggggggppggggggggggggttw",
+    "wggggggggggggppgggghhhhhgggggw",
+    "wggggttggggggppgggghhhhhgggggw",
+    "wggggttggggggppgggghhhhhgggggw",
+    "wggggggggggggppgggghhhhhgggggw",
+    "wggggggggrgggppggggggggggggggw",
+    "wffffffffffffppffffffggggggggw",
+    "wggggggggggggppggggggggggrgggw",
+    "wgggtttggggggppggggggggggggggw",
+    "wgggtttggggggppggggggggggttggw",
+    "wggggggggggggppggggggrggggtggw",
+    "wggggggggggggppppppppppppppggw",
+    "wggggggggggggggggggggggggppggw",
+    "wggggggrgggggggggtttgggggppggw",
+    "wggggggggggggggggtttgggggppggw",
+    "wggttggggggggggggggggggggppggw",
+    "wggttgggggggggggrggggggggppggw",
+    "wggggggggggggggggggggggggppggw",
+    "wttttgggggggggggggggggtttppggw",
+    "wwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
+  ]
+}

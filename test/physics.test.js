@@ -1,0 +1,57 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { getAnimationFrame } from "../src/animation.js";
+import { cameraFor, collides, movePlayer, velocityFromInput } from "../src/physics.js";
+
+const hero = { width: 48, height: 64, collider: { offsetX: 11, offsetY: 42, width: 26, height: 18 } };
+const map = {
+  tileSize: 48,
+  width: 5,
+  solidTiles: ["w", "r"],
+  rows: ["wwwww", "wgggw", "wgggw", "wgggw", "wwwww"],
+};
+const mapWithWall = { ...map, rows: ["wwwww", "wgrgw", "wgrgw", "wgrgw", "wwwww"] };
+const sprite = { framesPerSecond: 8, animation: [0, 1, 2, 1] };
+
+test("walking animation cycles while idle uses the center frame", () => {
+  assert.equal(getAnimationFrame(false, 100, sprite), 1);
+  assert.equal(getAnimationFrame(true, 0, sprite), 0);
+  assert.equal(getAnimationFrame(true, 0.13, sprite), 1);
+  assert.equal(getAnimationFrame(true, 0.26, sprite), 2);
+});
+
+test("diagonal movement preserves the configured speed", () => {
+  const velocity = velocityFromInput({ up: true, right: true }, 190);
+  assert.ok(Math.abs(Math.hypot(velocity.x, velocity.y) - 190) < 0.001);
+  assert.ok(velocity.x > 0);
+  assert.ok(velocity.y < 0);
+});
+
+test("player moves through open ground", () => {
+  const player = { x: 48, y: 48 };
+  const moved = movePlayer(player, { x: 30, y: 0 }, 0.5, map, hero);
+  assert.equal(moved.x, 63);
+  assert.equal(moved.y, 48);
+});
+
+test("player cannot pass through a solid tile", () => {
+  const player = { x: 48, y: 48 };
+  const moved = movePlayer(player, { x: 180, y: 0 }, 1, mapWithWall, hero);
+  assert.ok(moved.x + hero.collider.offsetX + hero.collider.width <= 96);
+  assert.equal(moved.y, 48);
+  assert.equal(collides(moved, mapWithWall, hero), false);
+});
+
+test("axis-separated collision allows sliding along an obstacle", () => {
+  const player = { x: 48, y: 48 };
+  const moved = movePlayer(player, { x: 80, y: 24 }, 1, mapWithWall, hero);
+  assert.ok(moved.x < 80);
+  assert.ok(Math.abs(moved.y - 72) < 0.001);
+});
+
+test("camera follows the player and clamps to every map edge", () => {
+  const viewport = { width: 100, height: 100 };
+  assert.deepEqual(cameraFor({ x: 0, y: 0 }, map, viewport, hero), { x: 0, y: 0 });
+  assert.deepEqual(cameraFor({ x: 500, y: 500 }, map, viewport, hero), { x: 140, y: 140 });
+  assert.deepEqual(cameraFor({ x: 96, y: 96 }, map, viewport, hero), { x: 70, y: 78 });
+});
