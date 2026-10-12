@@ -11,13 +11,15 @@ const map = {
   rows: ["wwwww", "wgggw", "wgggw", "wgggw", "wwwww"],
 };
 const mapWithWall = { ...map, rows: ["wwwww", "wgrgw", "wgrgw", "wgrgw", "wwwww"] };
-const sprite = { framesPerSecond: 8, animation: [0, 1, 2, 1] };
+const sprite = { framesPerSecond: 10, idleFrame: 2, animation: [0, 1, 2, 3, 4, 5] };
 
-test("walking animation cycles while idle uses the center frame", () => {
-  assert.equal(getAnimationFrame(false, 100, sprite), 1);
+test("walking animation cycles through six frames while idle uses its configured frame", () => {
+  assert.equal(getAnimationFrame(false, 100, sprite), 2);
   assert.equal(getAnimationFrame(true, 0, sprite), 0);
-  assert.equal(getAnimationFrame(true, 0.13, sprite), 1);
-  assert.equal(getAnimationFrame(true, 0.26, sprite), 2);
+  assert.equal(getAnimationFrame(true, 0.11, sprite), 1);
+  assert.equal(getAnimationFrame(true, 0.21, sprite), 2);
+  assert.equal(getAnimationFrame(true, 0.51, sprite), 5);
+  assert.equal(getAnimationFrame(true, 0.61, sprite), 0);
 });
 
 test("diagonal movement preserves the configured speed", () => {
