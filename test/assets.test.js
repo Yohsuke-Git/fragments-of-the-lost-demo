@@ -21,3 +21,9 @@ test("direction corrections stay inside each source frame", () => {
     assert.ok(HERO_SPRITE.directionOffsetY[direction] >= 0);
   }
 });
+
+test("left walk mirrors the alternating right-facing frames", () => {
+  assert.equal(HERO_SPRITE.directionRow.left, HERO_SPRITE.directionRow.right);
+  assert.equal(HERO_SPRITE.directionFlipX.left, true);
+  assert.equal(HERO_SPRITE.directionFlipX.right, false);
+});
