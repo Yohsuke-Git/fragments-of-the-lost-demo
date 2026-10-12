@@ -53,8 +53,9 @@ export function movePlayer(player, velocity, deltaSeconds, map, heroConfig) {
 export function cameraFor(player, map, viewport, heroConfig) {
   const mapWidth = map.width * map.tileSize;
   const mapHeight = map.rows.length * map.tileSize;
-  const desiredX = player.x + heroConfig.width / 2 - viewport.width / 2;
-  const desiredY = player.y + heroConfig.height / 2 - viewport.height / 2;
+  const box = getCollider(player, heroConfig);
+  const desiredX = box.x + box.width / 2 - viewport.width / 2;
+  const desiredY = box.y + box.height / 2 - viewport.height / 2;
   return {
     x: clamp(desiredX, 0, Math.max(0, mapWidth - viewport.width)),
     y: clamp(desiredY, 0, Math.max(0, mapHeight - viewport.height)),

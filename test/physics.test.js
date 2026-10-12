@@ -51,7 +51,7 @@ test("axis-separated collision allows sliding along an obstacle", () => {
 
 test("camera follows the player and clamps to every map edge", () => {
   const viewport = { width: 100, height: 100 };
-  assert.deepEqual(cameraFor({ x: 0, y: 0 }, map, viewport, hero), { x: 0, y: 0 });
+  assert.deepEqual(cameraFor({ x: 0, y: 0 }, map, viewport, hero), { x: 0, y: 1 });
   assert.deepEqual(cameraFor({ x: 500, y: 500 }, map, viewport, hero), { x: 140, y: 140 });
-  assert.deepEqual(cameraFor({ x: 96, y: 96 }, map, viewport, hero), { x: 70, y: 78 });
+  assert.deepEqual(cameraFor({ x: 96, y: 96 }, map, viewport, hero), { x: 70, y: 97 });
 });

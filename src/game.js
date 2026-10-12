@@ -51,8 +51,8 @@ async function load() {
   validateMap(map);
   heroImage = image;
   player = {
-    x: map.spawn.column * map.tileSize,
-    y: map.spawn.row * map.tileSize - (HERO.height - map.tileSize),
+    x: map.spawn.column * map.tileSize + (map.tileSize - HERO.width) / 2,
+    y: (map.spawn.row + 1) * map.tileSize - HERO.height,
     direction: "down",
     moving: false,
   };
@@ -230,6 +230,8 @@ function drawHero() {
   context.beginPath();
   context.ellipse(x + HERO.width / 2, y + HERO.height - 4, 17, 6, 0, 0, Math.PI * 2);
   context.fill();
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
   context.drawImage(
     heroImage,
     frame * HERO_SPRITE.frameWidth,
@@ -241,6 +243,7 @@ function drawHero() {
     HERO.width,
     HERO.height,
   );
+  context.imageSmoothingEnabled = false;
 }
 
 load().catch((error) => {
