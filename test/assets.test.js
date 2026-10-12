@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { HERO_SPRITE } from "../src/config.js";
+import { HERO, HERO_SPRITE } from "../src/config.js";
 
 test("fixed hero PNG matches the configured 6 by 4 sprite grid", async () => {
   const imageUrl = new URL(`../${HERO_SPRITE.url}`, import.meta.url);
@@ -29,4 +29,11 @@ test("left walk mirrors the correct six-frame right-facing cycle", () => {
   assert.equal(HERO_SPRITE.directionFlipX.right, false);
   assert.equal(HERO_SPRITE.sourceInsets.left.top, 1);
   assert.equal(HERO_SPRITE.sourceInsets.right.top, 1);
+});
+
+test("town walking pace keeps each limb pose visible", () => {
+  assert.equal(HERO.speed, 90);
+  assert.equal(HERO_SPRITE.framesPerSecond, 7);
+  assert.ok(HERO_SPRITE.blendStart.left >= 0.6);
+  assert.ok(HERO_SPRITE.blendStart.up >= 0.8);
 });
