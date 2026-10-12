@@ -8,6 +8,12 @@ export function velocityFromInput(input, speed) {
   return { x: horizontal / length * speed, y: vertical / length * speed };
 }
 
+export function directionFromVelocity(velocity) {
+  if (velocity.x !== 0 && velocity.y !== 0) return velocity.x > 0 ? "right" : "left";
+  if (Math.abs(velocity.x) > Math.abs(velocity.y)) return velocity.x > 0 ? "right" : "left";
+  return velocity.y > 0 ? "down" : "up";
+}
+
 export function getCollider(player, heroConfig) {
   const box = heroConfig.collider;
   return {

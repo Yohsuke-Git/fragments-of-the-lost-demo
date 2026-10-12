@@ -22,9 +22,11 @@ test("direction corrections stay inside each source frame", () => {
   }
 });
 
-test("each direction uses its own six-frame animation row", () => {
+test("left walk mirrors the correct six-frame right-facing cycle", () => {
   assert.deepEqual(HERO_SPRITE.animation, [0, 1, 2, 3, 4, 5]);
-  assert.equal(new Set(Object.values(HERO_SPRITE.directionRow)).size, 4);
-  assert.equal(HERO_SPRITE.directionFlipX.left, false);
+  assert.equal(HERO_SPRITE.directionRow.left, HERO_SPRITE.directionRow.right);
+  assert.equal(HERO_SPRITE.directionFlipX.left, true);
   assert.equal(HERO_SPRITE.directionFlipX.right, false);
+  assert.equal(HERO_SPRITE.sourceInsets.left.top, 1);
+  assert.equal(HERO_SPRITE.sourceInsets.right.top, 1);
 });

@@ -1,7 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { getAnimationFrame } from "../src/animation.js";
-import { cameraFor, collides, movePlayer, velocityFromInput } from "../src/physics.js";
+import { getAnimationFrame, getAnimationState } from "../src/animation.js";
+import {
+  cameraFor,
+  collides,
+  directionFromVelocity,
+  movePlayer,
+  velocityFromInput,
+} from "../src/physics.js";
 
 const hero = { width: 48, height: 64, collider: { offsetX: 11, offsetY: 42, width: 26, height: 18 } };
 const map = {
@@ -22,11 +28,37 @@ test("walking animation cycles through six frames while idle uses its configured
   assert.equal(getAnimationFrame(true, 0.61, sprite), 0);
 });
 
+test("walking animation smoothly blends each frame into the next", () => {
+  assert.deepEqual(getAnimationState(false, 100, sprite), {
+    currentFrame: 2,
+    nextFrame: 2,
+    progress: 0,
+    blend: 0,
+  });
+  const transition = getAnimationState(true, 0.05, sprite);
+  assert.equal(transition.currentFrame, 0);
+  assert.equal(transition.nextFrame, 1);
+  assert.equal(transition.blend, 0.5);
+  const loop = getAnimationState(true, 0.59, sprite);
+  assert.equal(loop.currentFrame, 5);
+  assert.equal(loop.nextFrame, 0);
+  assert.ok(loop.blend > 0.9);
+});
+
 test("diagonal movement preserves the configured speed", () => {
   const velocity = velocityFromInput({ up: true, right: true }, 190);
   assert.ok(Math.abs(Math.hypot(velocity.x, velocity.y) - 190) < 0.001);
   assert.ok(velocity.x > 0);
   assert.ok(velocity.y < 0);
+});
+
+test("diagonal movement uses the horizontal facing instead of front or back", () => {
+  assert.equal(directionFromVelocity({ x: 1, y: 1 }), "right");
+  assert.equal(directionFromVelocity({ x: -1, y: 1 }), "left");
+  assert.equal(directionFromVelocity({ x: 1, y: -1 }), "right");
+  assert.equal(directionFromVelocity({ x: -1, y: -1 }), "left");
+  assert.equal(directionFromVelocity({ x: 0, y: 1 }), "down");
+  assert.equal(directionFromVelocity({ x: 0, y: -1 }), "up");
 });
 
 test("player moves through open ground", () => {
