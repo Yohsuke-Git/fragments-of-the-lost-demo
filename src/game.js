@@ -226,6 +226,9 @@ function drawHero() {
   const frame = getAnimationFrame(player.moving, elapsed, HERO_SPRITE);
   const x = Math.round(player.x - camera.x);
   const y = Math.round(player.y - camera.y);
+  const inset = HERO_SPRITE.sourceInsets[player.direction];
+  const scaleX = HERO.width / HERO_SPRITE.frameWidth;
+  const scaleY = HERO.height / HERO_SPRITE.frameHeight;
   context.fillStyle = "rgba(16, 27, 20, .32)";
   context.beginPath();
   context.ellipse(x + HERO.width / 2, y + HERO.height - 4, 17, 6, 0, 0, Math.PI * 2);
@@ -234,14 +237,14 @@ function drawHero() {
   context.imageSmoothingQuality = "high";
   context.drawImage(
     heroImage,
-    frame * HERO_SPRITE.frameWidth,
-    row * HERO_SPRITE.frameHeight,
-    HERO_SPRITE.frameWidth,
-    HERO_SPRITE.frameHeight,
-    x,
-    y,
-    HERO.width,
-    HERO.height,
+    frame * HERO_SPRITE.frameWidth + inset.left,
+    row * HERO_SPRITE.frameHeight + inset.top,
+    HERO_SPRITE.frameWidth - inset.left - inset.right,
+    HERO_SPRITE.frameHeight - inset.top - inset.bottom,
+    x + inset.left * scaleX,
+    y + HERO_SPRITE.directionOffsetY[player.direction] + inset.top * scaleY,
+    HERO.width - (inset.left + inset.right) * scaleX,
+    HERO.height - (inset.top + inset.bottom) * scaleY,
   );
   context.imageSmoothingEnabled = false;
 }

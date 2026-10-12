@@ -12,3 +12,12 @@ test("fixed hero PNG matches the configured 3 by 4 sprite grid", async () => {
   assert.equal(width, HERO_SPRITE.frameWidth * 3);
   assert.equal(height, HERO_SPRITE.frameHeight * 4);
 });
+
+test("direction corrections stay inside each source frame", () => {
+  for (const direction of Object.keys(HERO_SPRITE.directionRow)) {
+    const inset = HERO_SPRITE.sourceInsets[direction];
+    assert.ok(inset.left + inset.right < HERO_SPRITE.frameWidth);
+    assert.ok(inset.top + inset.bottom < HERO_SPRITE.frameHeight);
+    assert.ok(HERO_SPRITE.directionOffsetY[direction] >= 0);
+  }
+});
