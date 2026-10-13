@@ -8,7 +8,7 @@ export const HERO = Object.freeze({
 });
 
 export const HERO_SPRITE = Object.freeze({
-  url: "assets/characters/hero/hero-walk-8x4.png",
+  url: "assets/characters/hero/hero-walk-painted-8x4.png",
   frameWidth: 256,
   frameHeight: 256,
   framesPerRow: 8,

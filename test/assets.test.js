@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { HERO, HERO_SPRITE } from "../src/config.js";
 
-test("fixed hero PNG matches the configured 8 by 4 sprite grid", async () => {
+test("high-detail hero PNG matches the configured 8 by 4 sprite grid", async () => {
   const imageUrl = new URL(`../${HERO_SPRITE.url}`, import.meta.url);
   const png = await readFile(imageUrl);
   assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
